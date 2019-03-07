@@ -6,8 +6,13 @@ As per implementation in C, Source: https://github.com/jamesroutley/write-a-hash
 
 ## To-Do
 
-- Write tests
 - Implement as redis server.
+
+## Testing
+
+```
+go test hashtable/*
+```
 
 ## Interface
 
