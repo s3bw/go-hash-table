@@ -84,3 +84,15 @@ When using open addressing, deleting is slightly more complicated then inserting
 searching. The item we wish to delete may be part of a collision chain. Removing it would
 break that chain and finding the items in the tail of the chain impossible. To solve this,
 we simply mark it as deleted.
+
+## Resizing
+
+As more items are inserted into a hash table the chance of collision increases and the
+hash table will eventually fail if we don't resize it to be able to include more items.
+
+A hash table's `load` is the ratio of filled buckets to total buckets.
+
+We will aim to resize up when `load > 0.7` and resize down when `load < 0.1`.
+
+To resize we create a new hash table roughly half or twice as big as the current, and
+insert all non-deleted items.

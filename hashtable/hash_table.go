@@ -4,6 +4,22 @@ Since Go is garbage collected we can avoid freeing
 memory (as is implemented in the C tutorial). */
 package hashtable
 
+const (
+	// BaseHashTableSize is the default size for the hash table
+	BaseHashTableSize = 51
+
+	// The hash table load is calculated as follows:
+	// Load = (Count / Size)
+
+	// MaxLoad determines the upper limit of a hash table load
+	// before we decide to resize
+	MaxLoad = 70
+
+	// MinLoad determines the lower limit of a hash table load
+	// before we decide to resize
+	MinLoad = 10
+)
+
 type Dictionary interface {
 	// Insert consider resize or returning err if full
 	Insert(key string, value []byte)
@@ -25,9 +41,10 @@ type Item struct {
 }
 
 type HashTable struct {
-	Size  int
-	Count int
-	Items []*Item
+	Size     int
+	BaseSize int
+	Count    int
+	Items    []*Item
 }
 
 func newItem(k string, v []byte) *Item {
@@ -38,16 +55,27 @@ func newItem(k string, v []byte) *Item {
 	}
 }
 
-func NewHashTable() *HashTable {
-	size := 53
+func NewSizedHashTable(baseSize int) *HashTable {
+	size := NextPrime(baseSize)
 	return &HashTable{
-		Size:  size,
-		Count: 0,
-		Items: make([]*Item, size),
+		BaseSize: baseSize,
+		Size:     size,
+		Count:    0,
+		Items:    make([]*Item, size),
 	}
 }
 
+func NewHashTable() *HashTable {
+	return NewSizedHashTable(BaseHashTableSize)
+}
+
 func (ht *HashTable) Insert(key string, value []byte) {
+	// Check hash table load to deduce if we need to resize
+	load := ht.Count * 100 / ht.Size
+	if load > MaxLoad {
+		ht.ResizeUp()
+	}
+
 	item := newItem(key, value)
 	for a := 0; a < ht.Size; a++ {
 		index := HashFunction(item.Key, ht.Size, a)
@@ -83,6 +111,12 @@ func (ht *HashTable) Search(key string) *Item {
 }
 
 func (ht *HashTable) Delete(key string) {
+	// Check hash table load to deduce if we need to resize
+	load := ht.Count * 100 / ht.Size
+	if load < MinLoad {
+		ht.ResizeDown()
+	}
+
 	for a := 0; a < ht.Size; a++ {
 		index := HashFunction(key, ht.Size, a)
 		item := ht.Items[index]
@@ -98,4 +132,28 @@ func (ht *HashTable) Delete(key string) {
 			}
 		}
 	}
+}
+
+func (ht *HashTable) ResizeUp() {
+	newSize := ht.BaseSize * 2
+	ht.resize(newSize)
+}
+
+func (ht *HashTable) ResizeDown() {
+	newSize := ht.BaseSize / 2
+	ht.resize(newSize)
+}
+
+func (ht *HashTable) resize(baseSize int) {
+	if baseSize < BaseHashTableSize {
+		return
+	}
+	newHashTable := NewSizedHashTable(baseSize)
+	for i := 0; i < ht.Size; i++ {
+		item := ht.Items[i]
+		if (item != nil) && (!item.Deleted) {
+			newHashTable.Insert(item.Key, item.Value)
+		}
+	}
+	*ht = *newHashTable
 }

@@ -53,4 +53,22 @@ func main() {
 		fmt.Println("Did not find anything.")
 	}
 
+	// Test expect 59
+	prime := hashtable.NextPrime(54)
+	fmt.Println(prime)
+
+	// Test base size goes from 51 -> 102 -> 51
+	// Count remains 1
+	hashTable.Insert(cat, catValue)
+	fmt.Println(hashTable.BaseSize)
+	fmt.Println(hashTable.Count)
+
+	hashTable.ResizeUp()
+	fmt.Println(hashTable.BaseSize)
+	fmt.Println(hashTable.Count)
+
+	hashTable.ResizeDown()
+	fmt.Println(hashTable.BaseSize)
+	fmt.Println(hashTable.Count)
+
 }
