@@ -48,3 +48,30 @@ def hash(string, a, num_buckets):
 ```
 
 Changing the value of `a` gives us a different hash function. `hash("cat, 163, 53) = 3`
+
+### Handling collisions
+
+Different input keys will map to the same array index, this causes a collision. Hash
+tables need to implement a method of dealing with these collisions.
+
+The tutorial uses a technique called open addressing with double hashing. Double hashing
+makes use of two hash functions to calculate the index an item should be stored at after
+`i` collisions.
+
+#### Double Hashing
+
+The index that should be used after `i` collisions is given by
+
+```
+index = hash_a(string) + i * hash_b(string) % num_buckets
+```
+
+Given the function above `0` collisions will indicate the bucket is determined just by
+`hash_a`
+
+#### Deleting
+
+When using open addressing, deleting is slightly more complicated then inserting or
+searching. The item we wish to delete may be part of a collision chain. Removing it would
+break that chain and finding the items in the tail of the chain impossible. To solve this,
+we simply mark it as deleted.
