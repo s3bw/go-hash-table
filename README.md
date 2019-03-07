@@ -6,8 +6,6 @@ As per implementation in C, Source: https://github.com/jamesroutley/write-a-hash
 
 ## To-Do
 
-- Step 06
-- Appendix
 - Write tests
 - Implement as redis server.
 
@@ -96,3 +94,76 @@ We will aim to resize up when `load > 0.7` and resize down when `load < 0.1`.
 
 To resize we create a new hash table roughly half or twice as big as the current, and
 insert all non-deleted items.
+
+
+## Alternative approaches to collision handling
+
+ - Separate chaining
+ - Open addressing
+
+### Separate chaining
+
+Under separate chaining. each bucket contains a linked list. When items collide, they are
+added to the list. Methods:
+
+- `Insert`: hash the key to get the bucket index. If there is nothing in that bucket,
+  store the item there. If there is already an item there, append the item to the linked
+  list.
+- `Search`: hash the key to get the bucket index. Traverse the linked list, comparing each
+  item's key to the search key. If the key is found, return the value, else return `nil`.
+- `Delete` hash the key to get the bucket index. Traverse the linked list, comparing each
+  item's key to the delete key. If the key is found, remove the item from the linked list.
+  If there is only one item in the linked list, place the `nil` pointer in the bucket, to
+  indicate that it is empty.
+
+This has the advantage of being simple to implement, but is space inefficient. Each item
+has to also store a pointer to the next item in the linked list, or the `nil` pointer if
+no items come after it. This is space wasted on bookkeeping, which could be spent on
+storing more items.
+
+### Open addressing
+
+Open addressing aims to solve the space inefficiency of separate chaining. When
+collisions happen, the collided item is place in some other bucket in the table. The
+bucket that the item is placed into is chosen according to some predetermined rule, which
+can be repeated when searching for the item. There are three common methods for choosing
+the bucket to insert a collided item into.
+
+Note: Open addressing can lead to more concise tables with better cache performance than
+bucketing, but performance will be more brittle as the load factor (ratio of occupancy to
+capacity) of the hash table starts to get high.
+
+#### Linear probing
+
+When a collision occurs, the index is incremented and the item is put in the next
+available bucket in the array.
+
+Linear probing offers good cache performance, but suffers from clustering issues. Putting
+collided items in the next available bucket can lead to long contiguous stretches of
+filled buckets, which need to be iterated over when inserting, searching or deleting.
+
+#### Quadratic probing
+
+Similar to linear probing, but instead of putting the collided item in the next available
+bucket, we try to put it in the buckets whose indexes follow the sequence: `i, i + 1, i +
+4, i + 9, i + 16, ... `, where `i` is the original hash of the key.
+
+Quadratic probing reduces, but does not remove, clustering, and still offers decent cache
+performance.
+
+#### Double hashing
+
+Double hashing aims to solve the clustering problem. To do so, we use a second hash
+function to choose a new index for the item. Using a hash function gives us a new bucket,
+the index of which should be evenly distributed across all buckets. This removes
+clustering, but also removes any boosted cache performance from locality of reference.
+Double hashing is a common method of collision management in production hash tables.
+
+## How big should a hash table be?
+
+The hash function maps keys to an integer between `0 -> m -1`.
+
+With bucketing, `m` should be about the same as the maximum number of items you expect to
+put into the table. With open addressing, make it (say) 30% larger or more. Selecting `m`
+to be a prime number minimizes the danger of a bad hash function.
+
