@@ -2,6 +2,13 @@
 
 As per implementation in C, Source: https://github.com/jamesroutley/write-a-hash-table/
 
+## To-Do
+
+- Step 06
+- Appendix
+- Write tests
+- Implement as redis server.
+
 ## Interface
 
 Associative arrays are a collection of unordered key-value pairs. Duplicate keys are not
