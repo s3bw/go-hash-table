@@ -6,7 +6,7 @@ package hashtable
 
 const (
 	// BaseHashTableSize is the default size for the hash table
-	BaseHashTableSize = 51
+	BaseHashTableSize = 53
 
 	// The hash table load is calculated as follows:
 	// Load = (Count / Size)
