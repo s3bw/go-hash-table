@@ -2,6 +2,8 @@
 
 As per implementation in C, Source: https://github.com/jamesroutley/write-a-hash-table/
 
+- Go map Source: https://github.com/golang/go/blob/master/src/runtime/map.go
+
 ## To-Do
 
 - Step 06
