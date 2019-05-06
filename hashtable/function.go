@@ -15,11 +15,11 @@ func pow(a, b int) int {
 
 func Hash(s string, prime, mod int) int {
 	hash := 0
-	len_s := len(s)
-	for i := 0; i < len_s; i++ {
-		hash += pow(prime, len_s-(i+1)) * int(s[i])
-		hash = hash % mod
+	lenS := len(s)
+	for i := 0; i < lenS; i++ {
+		hash += pow(prime, lenS-(i+1)) * int(s[i])
 	}
+	hash = hash % mod
 	return int(hash)
 }
 
