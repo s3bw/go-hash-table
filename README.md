@@ -59,7 +59,7 @@ def hash(string, a, num_buckets):
 5
 ```
 
-Changing the value of `a` gives us a different hash function. `hash("cat, 163, 53) = 3`
+Changing the value of `a` gives us a different hash function. `hash("cat", 163, 53) = 3`
 
 ### Handling collisions
 
